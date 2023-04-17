@@ -1,0 +1,64 @@
+---
+- name: Create interface configuration
+  hosts: routers
+  gather_facts: no
+
+  vars:
+    routers:
+      R11:
+        loopback:
+          id: Loopback0
+          description: Router ID
+          ip:
+            address: 10.0.0.11
+            mask: 255.255.255.255
+      R12:
+        loopback:
+          id: Loopback0
+          description: ROUTER ID
+          ip:
+            address: 10.0.0.12
+            mask: 255.255.255.255
+      R21:
+        loopback:
+          id: Loopback0
+          description: ROUTER ID
+          ip:
+            address: 10.0.0.21
+            mask: 255.255.255.255
+      R22:
+        loopback:
+          id: Loopback0
+          description: ROUTER ID
+          ip:
+            address: 10.0.0.22
+            mask: 255.255.255.255
+      R23:
+        loopback:
+          id: Loopback0
+          description: ROUTER ID
+          ip:
+            address: 10.0.0.23
+            mask: 255.255.255.255
+
+  tasks:
+
+    - name: Configure Loopback interface settings
+      ios_config:
+        parents: "interface {{ routers[ inventory_hostname ].loopback.id }}"
+        lines:
+          - "description {{ routers[ inventory_hostname ].loopback.description }}"
+          - "ip address {{ routers[ inventory_hostname ].loopback.ip.address }} {{ routers[ inventory_hostname ].loopback.ip.mask}}"
+
+    - name: Configure spine-leaf interface settings
+      ios_config:
+        parents: "interface {{ item.id }}"
+        lines:
+          - "description {{ item.description }}"
+          - "encapsulation dot1Q {{ item.vlan }}"
+          - "ip address {{ item.ip.address }} {{ item.ip.mask}}"
+      with_items: "{{ routers[ inventory_hostname ].interfaces }}"
+
+    - name: Save running to startup when modified
+      ios_config:
+        save_when: modified

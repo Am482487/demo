@@ -1,0 +1,15 @@
+---
+- name: Run command to print interface names on routers
+  hosts: routers
+  gather_facts: false
+
+  tasks:
+    - name: Show interfaces
+      ios_command:
+        commands:
+          - show ip interface brief
+      register: output
+
+    - name: Display the output
+      debug:
+        var: output.stdout_lines

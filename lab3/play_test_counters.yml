@@ -1,0 +1,16 @@
+---
+- name: Display Interface Statistics
+  hosts: spine
+  gather_facts: no
+
+  tasks:
+
+    - name: Show interface stats summary
+      ios_command:
+        commands:
+          - show int GigabitEthernet 1 summary
+      register: output
+
+    - name: Display result
+      debug:
+        var: output.stdout_lines
